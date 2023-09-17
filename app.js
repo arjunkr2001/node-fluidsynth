@@ -3,7 +3,7 @@ var fs = require('fs');
 const WebSocket = require('ws');
 const wsServer = new WebSocket.Server({port:'8081'})
 const dgram = require('dgram');
-const udpServer = dgram.createSocket('udp4');
+let udpServer //= dgram.createSocket('udp4');
 
 const HTTP_PORT=8080;
 
@@ -49,12 +49,12 @@ fs.readFile('./index.html', function (err, html) {
             response.write(html);  
             response.end();  
         }
-        if(request.url==='/startBtn.png'){
-            fs.readFile('./startBtn.png',(err,data)=>{
-                response.setHeader('Content-Type','image/png');
-                response.end(data);
-            })
-        }
+        // if(request.url==='/startBtn.png'){
+        //     fs.readFile('./startBtn.png',(err,data)=>{
+        //         response.setHeader('Content-Type','image/png');
+        //         response.end(data);
+        //     })
+        // }
         
         
     }).listen(HTTP_PORT);
@@ -66,6 +66,8 @@ wsServer.on('connection',socket=>{
         //socket.send(`rog that! ${msg}`)
         console.log(msg.toString())
         if(msg.toString()==="start"){
+            udpServer = dgram.createSocket('udp4');
+
             udpServer.on('message', (message, remote) => {
                 // Handle the incoming message.
                 console.log(`Received message from ${remote.address}:${remote.port}: ${message}`);
@@ -78,6 +80,10 @@ wsServer.on('connection',socket=>{
               udpServer.bind(41234, () => {
                 console.log('Server listening on port 41234');
               });
+        }
+        if(msg.toString()==="stop"){
+            udpServer.close()
+            socket.send("closed")
         }
     })
 })
