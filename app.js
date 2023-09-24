@@ -72,9 +72,16 @@ wsServer.on('connection',socket=>{
                 // Handle the incoming message.
                 console.log(`Received message from ${remote.address}:${remote.port}: ${message}`);
                 fun(message.toString())
+
+                if(message.toString()[0]==='p')
+                    socket.send("piano")
+                else if(message.toString()[0]==='f')
+                    socket.send("flute")
+                else if(message.toString()[0]==='d')
+                    socket.send("drum")
               
                 // Send a response back to the client.
-                udpServer.send(Buffer.from('Hello from the server!'), remote.port, remote.address);
+                //udpServer.send(Buffer.from('Hello from the server!'), remote.port, remote.address);
               });
               
               udpServer.bind(41234, () => {
